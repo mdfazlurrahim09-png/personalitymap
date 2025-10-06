@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ব্যক্তিত্বের মানচিত্র: ১৬টি ধরন (বাংলা)</title>
+    <!-- Load Tailwind CSS CDN for single file build -->
+    <!-- This is the single largest external resource, loading it first is necessary -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- OPTIMIZATION: Load critical Bengali font (Noto Sans Bengali) and Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Bengali:wght@100..900&display=swap" rel="stylesheet">
+    
+    <!-- Configure Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-dark': '#113E40', // Deep Teal/Indigo for background
+                        'primary-light': '#D6F6F6', // Light Teal accent
+                        'secondary-yellow': '#FFD700', // Gold/Yellow for accents
+                        'text-light': '#F0F9FA',
+                        'role-analyst': '#1E40AF',   // Dark Blue
+                        'role-diplomat': '#059669',  // Emerald Green
+                        'role-sentinel': '#FBBF24',  // Amber Yellow
+                        'role-explorer': '#DC2626',  // Red
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans Bengali', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        /* CRITICAL CSS for immediate display */
+        body {
+            background-color: #113E40; 
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-card {
+            background-color: #1A4D50;
+            border: 1px solid #2C6E70;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            max-width: 95%; /* Responsive width */
+        }
+        
+        /* Optimized Transition for Perceived Speed */
+        .question-content {
+            opacity: 1;
+            transform: translateX(0);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+        .animate-out {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        /* Responsive Scale Container - Crucial for mobile responsiveness */
+        .scale-container { 
+            padding: 0; 
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-between; /* Ensures equal spacing */
+            gap: 0.25rem; /* Smaller gap for mobile */
+        }
+        
+        .scale-button {
+            flex-grow: 1; /* Makes buttons use all available width */
+            width: 13%; 
+            height: 45px; /* Slightly smaller height for mobile */
+            font-size: 0.9rem; /* Smaller font for mobile */
+            font-weight: 700;
+            border-radius: 0.5rem; 
+            background: #236569; 
+            color: #D6F6F6; 
+            transition: all 0.1s ease;
+            box-shadow: 
+                inset 0 1px 0 rgba(255, 255, 255, 0.2), 
+                inset 0 -1px 0 rgba(0, 0, 0, 0.2), 
+                0 4px 0 #1A4D50; 
+        }
+        
+        .scale-button.selected {
+            background: #FFD700; 
+            color: #113E40; 
+            transform: translateY(4px); 
+            box-shadow: 
+                inset 0 0 10px rgba(0, 0, 0, 0.5), 
+                0 0 0 #1A4D50; 
+            font-weight: 900;
+        }
+
+        /* Ensure better button size on tablet/desktop */
+        @media (min-width: 768px) {
+            .scale-button {
+                height: 50px;
+                font-size: 1.125rem;
+            }
+        }
+
+        .usage-counter-box { background-color: #2C6E70; padding: 0.25rem 0.5rem; border-radius: 0.75rem; font-size: 0.75rem; color: #ccc; margin-top: 1rem; box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6); }
+        .usage-counter-number { font-size: 0.875rem; color: #FFD700; font-weight: 700; margin-left: 0.25rem; }
+        
+        /* New Styles for Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        .modal-show {
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: #1A4D50;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            max-width: 450px;
+            width: 90%;
+            border: 2px solid #2C6E70;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s ease-out;
+        }
+        .modal-show .modal-content {
+            transform: scale(1);
+        }
+        
+        #score-description {
+            min-height: 20px; 
+            transition: color 0.3s, opacity 0.3s;
+        }
+        
+        .result-card { 
+            box-shadow: 0 0 40px rgba(255, 215, 0, 0.3); 
+            /* Ensure fast opacity transition for results to appear quickly */
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="font-sans text-text-light p-4 relative">
+
+    <!-- THE STEALTH 'A' BUTTON - ALMOST INVISIBLE 'A' (Only 5% opacity) -->
+    <button id="admin-toggle-btn" 
+            onclick="goToAdminLogin()" 
+            class="fixed top-2 right-2 z-50 
+                   p-1 bg-transparent text-primary-light/5 text-xs font-extrabold 
+                   hover:text-primary-light/20 hover:bg-primary-light/5 transition 
+                   shadow-none hidden cursor-pointer" 
+            aria-label="Admin Login">A</button>
+
+    <div id="app" class="w-full max-w-4xl main-card rounded-3xl p-6 md:p-10 my-8">
+        <!-- Initial loading state for extreme speed -->
+        <p class="text-center text-sm text-gray-400">Loading...</p>
+    </div>
+    
+    <div id="modal-container"></div>
+    
+    <script type="module">
+        // --- FIREBASE IMPORTS AND SETUP (Load Asynchronously) ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, getDoc, setLogLevel, collection, addDoc, query, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- GLOBAL CONFIGS (Immediate Access) ---
+        let app, db, auth;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const COUNTER_COLLECTION = `artifacts/${appId}/public/data/usage_counter`;
+        const FEEDBACK_COLLECTION = `artifacts/${appId}/public/data/feedback_entries`;
+        const COUNTER_DOC_PATH = 'global_count';
+        // SECURE ADMIN CREDENTIALS (Must be updated in a real deployment)
+        const ADMIN_USERNAME = 'html_admin_2025'; 
+        const ADMIN_PASSWORD = 'html_admin_2025';
+        
+        // --- DATA (Immediate Access) ---
+        const QUESTIONS = [
+            { id: 1, text: "সামাজিক অনুষ্ঠানে, আপনি সহজেই অনেক নতুন লোকের সাথে মিশতে পারেন এবং কথোপকথন শুরু করেন।", dimension: 'E', polarity: 1 },
+            { id: 2, text: "কোনো সিদ্ধান্ত নেওয়ার আগে আপনি বাস্তব পরিস্থিতি এবং প্রমাণিত তথ্যের উপর নির্ভর করেন, অনুমান নয়।", dimension: 'S', polarity: 1 },
+            { id: 3, text: "অন্যদের অনুভূতিতে আঘাত লাগতে পারে এমন সত্য কথা বলতে আপনি দ্বিধা করেন না।", dimension: 'T', polarity: 1 },
+            { id: 4, text: "আপনার দৈনন্দিন জীবনের প্রতিটি কাজ আগে থেকে পরিকল্পনা করা এবং সময়সূচী মেনে চলাই আপনার কাছে আরামদায়ক।", dimension: 'J', polarity: 1 },
+            { id: 5, text: "আপনি প্রায়শই আপনার মনকে আশেপাশে থাকা বাস্তবতার চেয়ে নতুন ধারণা এবং কল্পনার রাজ্যে হারিয়ে যেতে দেন।", dimension: 'S', polarity: -1 },
+            { id: 6, text: "দীর্ঘ সময় একা কাটালে আপনার শক্তি কমে যায় এবং আপনি ক্লান্ত বোধ করেন।", dimension: 'E', polarity: 1 },
+            { id: 7, text: "আপনি আবেগপ্রবণ সিদ্ধান্তের চেয়ে যুক্তিনির্ভর বিশ্লেষণকে বেশি বিশ্বাস করেন।", dimension: 'T', polarity: 1 },
+            { id: 8, text: "সময়সীমা বা রুটিন না থাকলে আপনি স্বচ্ছন্দ বোধ করেন এবং শেষ মুহূর্তের পরিবর্তনকে স্বাগত জানান।", dimension: 'J', polarity: -1 },
+            { id: 9, text: "আপনি প্রায়শই আপনার চারপাশে কী ঘটছে তা দ্রুত পর্যবেক্ষণ করেন এবং বিস্তারিত ছোট বিষয়গুলো খেয়াল করেন।", dimension: 'S', polarity: 1 },
+            { id: 10, text: "বিতর্কের সময়, আপনি অন্যের অনুভূতি বিবেচনা করে আলোচনাকে নরম করার চেষ্টা করেন।", dimension: 'T', polarity: -1 },
+            { id: 11, text: "আপনি কাজের আগে একটি বিশদ পরিকল্পনা এবং চেকলিস্ট তৈরি করতে পছন্দ করেন।", dimension: 'J', polarity: 1 },
+            { id: 12, text: "আপনি নিজের অভ্যন্তরীণ চিন্তাভাবনা এবং অনুভূতির উপর বেশি মনোযোগ দেন।", dimension: 'E', polarity: -1 },
+            { id: 13, text: "আপনার বন্ধু বা সহকর্মীরা প্রায়শই আপনার সাহায্য চান কারণ আপনি সহানুভূতিশীল এবং তাদের কথা মনোযোগ দিয়ে শোনেন।", dimension: 'T', polarity: -1 },
+            { id: 14, text: "আপনি হঠাৎ কোনো কাজ শুরু করতে এবং পথে পরিকল্পনা পরিবর্তন করতে পছন্দ করেন।", dimension: 'J', polarity: -1 },
+            { id: 15, text: "ভবিষ্যৎ নিয়ে অতিরিক্ত চিন্তা না করে আপনি বর্তমানে মনোযোগ দিতে পছন্দ করেন।", dimension: 'S', polarity: 1 },
+            { id: 16, text: "আপনি দলগত কাজের চেয়ে একা কাজ করতেই বেশি স্বচ্ছন্দ।", dimension: 'E', polarity: -1 },
+            { id: 17, text: "আপনি একটি বইয়ের প্রতিটি পৃষ্ঠা না পড়েও এর প্রধান ধারণাটি বুঝতে পারেন।", dimension: 'S', polarity: -1 },
+            { id: 18, text: "অন্যদের সাথে একটি সংবেদনশীল সংযোগ স্থাপন করা আপনার জন্য খুব গুরুত্বপূর্ণ।", dimension: 'T', polarity: -1 },
+            { id: 19, text: "আপনি প্রায়শই নিজেকে একটি গুরুত্বপূর্ণ ইভেন্টের শেষ মুহূর্তের জন্য প্রস্তুত দেখতে পান।", dimension: 'J', polarity: -1 },
+            { id: 20, text: "আপনি বিশ্বাস করেন যে বিশ্বের প্রায় সবকিছুরই একটি যুক্তিযুক্ত ব্যাখ্যা রয়েছে।", dimension: 'T', polarity: 1 },
+        ];
+        
+        const SCORE_VALUES = [-3, -2, -1, 0, 1, 2, 3];
+        const SCALE_LABELS_SHORT = ["-৩", "-২", "-১", "০", "+১", "+২", "+৩"];
+        const SCORE_DESCRIPTIONS = [
+            { text: "সম্পূর্ণ দ্বিমত। আপনার সাথে এই বক্তব্যের কোনো মিল নেই।", color: 'text-red-400' },
+            { text: "দৃঢ়ভাবে দ্বিমত। এই বক্তব্যের সাথে আপনার মিল সামান্যই।", color: 'text-red-300' },
+            { text: "সামান্য দ্বিমত। আপনি কিছুটা দ্বিমত পোষণ করেন।", color: 'text-red-200' },
+            { text: "নিরপেক্ষ। আপনার কোনো বিশেষ মত নেই বা উত্তরটি আপনার কাছে অপ্রাসঙ্গিক।", color: 'text-gray-400' },
+            { text: "সামান্য একমত। আপনি কিছুটা একমত পোষণ করেন।", color: 'text-green-200' },
+            { text: "দৃঢ়ভাবে একমত। এই বক্তব্যের সাথে আপনার যথেষ্ট মিল রয়েছে।", color: 'text-green-300' },
+            { text: "সম্পূর্ণ একমত। এই বক্তব্যটি আপনার জন্য একদম সঠিক।", color: 'text-green-400' },
+        ];
+        
+        const PERSONALITY_TYPES = {
+            INTJ: { name: "স্থপতি", emoji: "🧠", type: "INTJ", role: "Analyst", description: "দূরদর্শী চিন্তাবিদ, যারা সবকিছুতেই উন্নতি আনার পরিকল্পনা করেন। জ্ঞান এবং নির্ভুলতা তাদের মূল চালিকাশক্তি।" },
+            INTP: { name: "যুক্তিবিদ", emoji: "💡", type: "INTP", role: "Analyst", description: "উদ্ভাবনী, জটিল সমস্যা সমাধানে আগ্রহী এবং জ্ঞানের জন্য তৃষ্ণার্ত। সর্বদা নতুন ধারণা নিয়ে পরীক্ষা-নিরীক্ষা করেন।" },
+            ENTJ: { name: "সেনাপতি", emoji: "👑", type: "ENTJ", role: "Analyst", description: "সাহসী, কল্পনাবিলাসী এবং দৃঢ় ইচ্ছাশক্তিসম্পন্ন নেতা, যারা লক্ষ্য অর্জনের পথ খুঁজে নেন।" },
+            ENTP: { name: "বিতর্ককারী", emoji: "⚔️", type: "ENTP", role: "Analyst", description: "বুদ্ধিমান এবং কৌতূহলী চিন্তাবিদ যারা বুদ্ধিবৃত্তিক চ্যালেঞ্জ পছন্দ করেন।" },
+            INFJ: { name: "পরামর্শদাতা", emoji: "🕊️", type: "INFJ", role: "Diplomat", description: "শান্ত প্রকৃতির এবং রহস্যময়, তবুও অনুপ্রেরণাদায়ক এবং অক্লান্ত আদর্শবাদী। তারা অন্যদের সাহায্য করতে চান।" },
+            INFP: { name: "মধ্যস্থতাকারী", emoji: "🦋", type: "INFP", role: "Diplomat", description: "শান্ত এবং সংরক্ষিত, তবে দৃঢ় নৈতিকতা এবং মূল্যবোধ দ্বারা পরিচালিত। তারা গভীর অর্থ সন্ধান করেন।" },
+            ENFJ: { name: "প্রয়োজক", emoji: "✨", type: "ENFJ", role: "Diplomat", description: "আকর্ষণীয়, অনুপ্রাণিতকারী নেতা যারা অন্যদের ভালো করতে চান এবং সমাজের ইতিবাচক পরিবর্তন আনেন।" },
+            ENFP: { name: "প্রচারক", emoji: "🌈", type: "ENFP", role: "Diplomat", description: "উদ্যমী, সৃজনশীল, সামাজিক এবং মুক্ত মনের মানুষ। তারা জীবনকে সুযোগ হিসেবে দেখেন।" },
+            ISTJ: { name: "লজিস্টিকিয়ান", emoji: "🏛️", type: "ISTJ", role: "Sentinel", description: "বাস্তববাদী এবং তথ্য-ভিত্তিক মানুষ যাদের সততা নিয়ে প্রশ্ন তোলার অবকাশ নেই। তারা কর্তব্যপরায়ণ ও নির্ভরযোগ্য।" },
+            ISFJ: { name: "রক্ষক", emoji: "🛡️", type: "ISFJ", role: "Sentinel", description: "উত্সর্গীকৃত এবং উষ্ণ রক্ষাকারী, যারা তাদের প্রিয়জনদের রক্ষা করতে প্রস্তুত। তারা বিশ্বস্ত এবং সংবেদনশীল।" },
+            ESTJ: { name: "কার্যনির্বাহী", emoji: "💼", type: "ESTJ", role: "Sentinel", description: "দার্শনিক, চমৎকার প্রশাসক, যারা জিনিসপত্র গুছিয়ে আনতে এবং পরিচালনা করতে পছন্দ করেন।" },
+            ESFJ: { name: "পরামর্শদাতা", emoji: "🤝", type: "ESFJ", role: "Sentinel", description: "অত্যন্ত যত্নশীল, সামাজিক এবং মানুষের সাথে মিশতে আগ্রহী। তারা সমাজসেবায় সক্রিয়।" },
+            ISTP: { name: "গুণী", emoji: "🛠️", type: "ISTP", role: "Explorer", description: "সাহসী, ব্যবহারিক পরীক্ষক যারা হাতে-কলমে কাজ করতে এবং ত্রুটি বিশ্লেষণ করতে পছন্দ করেন।" },
+            ISFP: { name: "অভিযাত্রী", emoji: "🎨", type: "ISFP", role: "Explorer", description: "নমনীয়, মনোমুগ্ধকর শিল্পী যারা সর্বদা নতুন কিছু আবিষ্কার করতে প্রস্তুত। তারা নিজেদের মতো করে জীবন যাপন করেন।" },
+            ESTP: { name: "উদ্যোগী", emoji: "🚀", type: "ESTP", role: "Explorer", description: "স্মার্ট, উদ্যমী এবং খুব উপলব্ধিপ্রবণ মানুষ যারা ঝুঁকি নিতে ভালোবাসেন এবং কর্মের মাধ্যমে শেখেন।" },
+            ESFP: { name: "বিনোদনদাতা", emoji: "🎭", type: "ESFP", role: "Explorer", description: "স্বতঃস্ফূর্ত, উদ্যমী এবং প্রাণবন্ত মানুষ - যেখানেই যান, সেখানে আনন্দ নিয়ে আসেন। তারা লাইমলাইট পছন্দ করেন।" },
+        };
+        
+        const ROLE_COLORS = {
+            'Analyst': 'role-analyst',
+            'Diplomat': 'role-diplomat',
+            'Sentinel': 'role-sentinel',
+            'Explorer': 'role-explorer',
+        };
+
+        const DIMENSION_LABELS = {
+            E: 'বহির্মুখীতা (Extraversion)', I: 'অন্তর্মুখীতা (Introversion)',
+            S: 'সংবেদন (Sensing)', N: 'স্বজ্ঞা (Intuition)',
+            T: 'চিন্তাভাবনা (Thinking)', F: 'অনুভূতি (Feeling)',
+            J: 'বিচারক (Judging)', P: 'পর্যবেক্ষণ (Prospecting)',
+        };
+
+
+        // --- APPLICATION STATE & CORE LOGIC ---
+        let state = {
+            view: 'welcome',
+            currentQuestionIndex: 0,
+            answers: new Array(QUESTIONS.length).fill(null),
+            isQuizFinished: false,
+            finalResult: null,
+            firebaseInitialized: false,
+            totalUses: 0, 
+            userId: null,
+            isAdminLoggedIn: false,
+            feedbackList: [],
+            dynamicScoreDescription: null,
+            dynamicScoreColor: 'text-gray-400',
+        };
+
+        const appDiv = document.getElementById('app');
+        const modalContainer = document.getElementById('modal-container');
+        let isAnimating = false;
+        let unsubscribeFeedback = null;
+
+        // --- UTILITY FUNCTIONS ---
+        // Keeping these functions as data is still saved in Firestore, just not displayed
+        function parseUserAgent(userAgent) {
+            if (!userAgent) return 'অজানা ডিভাইস';
+            userAgent = userAgent.toLowerCase();
+            let os = 'Unknown OS';
+            if (userAgent.includes('windows')) os = 'Windows';
+            else if (userAgent.includes('android')) os = 'Android';
+            else if (userAgent.includes('iphone') || userAgent.includes('ipad')) os = 'iOS/iPadOS';
+            else if (userAgent.includes('macintosh')) os = 'macOS';
+            else if (userAgent.includes('linux')) os = 'Linux';
+            let deviceType = 'Desktop';
+            if (userAgent.includes('mobile') || userAgent.includes('android')) deviceType = 'Mobile';
+            else if (userAgent.includes('ipad') || (os === 'Android' && !userAgent.includes('mobile'))) deviceType = 'Tablet';
+            return `${deviceType} (${os})`;
+        }
+
+        function getLocaleDetails(localeInfo) {
+            if (!localeInfo) return { flag: '🌍', name: 'অজানা অঞ্চল' };
+            const parts = localeInfo.split('-');
+            const countryCode = (parts.length > 1 ? parts[1] : parts[0]).toUpperCase();
+            
+            const map = {
+                'BD': { flag: '🇧🇩', name: 'বাংলাদেশ' }, 'IN': { flag: '🇮🇳', name: 'ভারত' }, 
+                'PK': { flag: '🇵🇰', name: 'পাকিস্তান' }, 'US': { flag: '🇺🇸', name: 'মার্কিন যুক্তরাষ্ট্র' },
+                'GB': { flag: '🇬🇧', name: 'যুক্তরাজ্য' }, 'AU': { flag: '🇦🇺', name: 'অস্ট্রেলিয়া' },
+                'CA': { flag: '🇨🇦', name: 'কানাডা' }, 'DE': { flag: '🇩🇪', name: 'জার্মানি' },
+                'FR': { flag: '🇫🇷', name: 'ফ্রান্স' }, 'JP': { flag: '🇯🇵', name: 'জাপান' },
+                'KR': { flag: '🇰🇷', name: 'দক্ষিণ কোরিয়া' }, 'CN': { flag: '🇨🇳', name: ' চীন' },
+            };
+            
+            const result = map[countryCode];
+            if (result) return result;
+            
+            const langCode = parts[0].toUpperCase();
+            if (map[langCode]) return { ...map[langCode], name: `${map[langCode].name} (Locale: ${localeInfo})` };
+
+            return { flag: '🌍', name: `অজানা (${localeInfo})` }; 
+        }
+
+        function getDeviceInfo() {
+            return {
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height
+            };
+        }
+
+        // --- FIREBASE AND AUTH FUNCTIONS ---
+        // OPTIMIZATION: Ensure this is non-blocking to the initial render
+        async function initializeFirebase() {
+            if (!firebaseConfig) {
+                console.error("Firebase config is missing.");
+                state.firebaseInitialized = true; // Mark as initialized to stop trying
+                render(); 
+                return;
+            }
+            
+            try {
+                // setLogLevel('Debug'); // Disable debug logging by default for speed
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Use a non-blocking listener for auth state
+                onAuthStateChanged(auth, async (user) => {
+                    if (!user) {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } 
+                    // This second check ensures the userId is always set after any sign-in attempt
+                    if (auth.currentUser) {
+                        state.userId = auth.currentUser.uid || crypto.randomUUID();
+                    } else {
+                        state.userId = crypto.randomUUID();
+                    }
+                    
+                    if (!state.firebaseInitialized) {
+                        state.firebaseInitialized = true;
+                        setupCounterListener();
+                        render(); // Re-render only when auth is confirmed and counter is setup
+                    }
+                });
+
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                state.firebaseInitialized = true;
+                appDiv.innerHTML = `<div class="text-center p-8 text-red-400">ত্রুটি: ফায়ারবেস লোড করা যায়নি।</div>`;
+            }
+        }
+
+        function setupCounterListener() {
+            if (!state.firebaseInitialized) return;
+            const counterRef = doc(db, COUNTER_COLLECTION, COUNTER_DOC_PATH);
+            onSnapshot(counterRef, (docSnap) => {
+                let currentCount = 0;
+                if (docSnap.exists()) {
+                    currentCount = docSnap.data().count || 0;
+                }
+                state.totalUses = currentCount;
+                // Re-render only if admin dashboard is open to update the counter
+                if (state.view === 'admin_dashboard') render(); 
+            }, (error) => {
+                console.error("Error setting up counter listener:", error);
+            });
+        }
+        
+        async function updateUsageCounter() {
+            if (!state.firebaseInitialized || !db) return;
+            try {
+                const counterRef = doc(db, COUNTER_COLLECTION, COUNTER_DOC_PATH);
+                const snapshot = await getDoc(counterRef); 
+                let currentCount = 0;
+                if (snapshot.exists()) {
+                    currentCount = snapshot.data().count || 0;
+                }
+                await setDoc(counterRef, { 
+                    count: currentCount + 1,
+                    last_updated: new Date().toISOString()
+                }, { merge: true });
+            } catch (error) {
+                console.error("Error updating usage counter:", error);
+            }
+        }
+        
+        // --- QUIZ FLOW FUNCTIONS (Same as before, focused on smooth transitions) ---
+
+        function goToHome() {
+            state.view = 'welcome';
+            state.answers.fill(null);
+            state.currentQuestionIndex = 0;
+            state.isQuizFinished = false;
+            state.finalResult = null;
+            state.dynamicScoreDescription = null;
+            state.dynamicScoreColor = 'text-gray-400';
+            if (unsubscribeFeedback) {
+                unsubscribeFeedback(); 
+                unsubscribeFeedback = null;
+            }
+            state.isAdminLoggedIn = false;
+            render();
+        }
+
+        function startQuiz() {
+            state.view = 'quiz';
+            state.isQuizFinished = false;
+            state.currentQuestionIndex = 0;
+            state.answers.fill(null);
+            state.dynamicScoreDescription = null;
+            state.dynamicScoreColor = 'text-gray-400';
+            render();
+        }
+
+        function nextQuestion() {
+            if (state.answers[state.currentQuestionIndex] === null || isAnimating) return;
+            const contentDiv = document.getElementById('question-content');
+            if (contentDiv) {
+                isAnimating = true;
+                contentDiv.classList.add('animate-out');
+            }
+            
+            setTimeout(() => {
+                if (state.currentQuestionIndex < QUESTIONS.length - 1) {
+                    state.currentQuestionIndex++;
+                    state.dynamicScoreDescription = state.answers[state.currentQuestionIndex] !== null ? SCORE_DESCRIPTIONS[state.answers[state.currentQuestionIndex]].text : null;
+                    state.dynamicScoreColor = state.answers[state.currentQuestionIndex] !== null ? SCORE_DESCRIPTIONS[state.answers[state.currentQuestionIndex]].color : 'text-gray-400';
+                    render();
+                } else {
+                    calculateResult();
+                }
+                isAnimating = false;
+            }, 400); // 400ms delay for snappier transition
+        }
+
+        function previousQuestion() {
+            if (state.currentQuestionIndex === 0 || isAnimating) return;
+            const contentDiv = document.getElementById('question-content');
+            if (contentDiv) {
+                isAnimating = true;
+                contentDiv.style.transform = 'translateX(20px)'; 
+                contentDiv.classList.add('animate-out');
+            }
+            
+            setTimeout(() => {
+                state.currentQuestionIndex--;
+                state.dynamicScoreDescription = state.answers[state.currentQuestionIndex] !== null ? SCORE_DESCRIPTIONS[state.answers[state.currentQuestionIndex]].text : null;
+                state.dynamicScoreColor = state.answers[state.currentQuestionIndex] !== null ? SCORE_DESCRIPTIONS[state.answers[state.currentQuestionIndex]].color : 'text-gray-400';
+                render();
+                isAnimating = false;
+            }, 400); 
+        }
+
+        function selectAnswer(scoreIndex) {
+            if (isAnimating) return; 
+            
+            state.answers[state.currentQuestionIndex] = scoreIndex;
+            
+            // Update the dynamic score description immediately
+            state.dynamicScoreDescription = SCORE_DESCRIPTIONS[scoreIndex].text;
+            state.dynamicScoreColor = SCORE_DESCRIPTIONS[scoreIndex].color;
+            
+            render(); 
+            
+            if (state.currentQuestionIndex < QUESTIONS.length - 1) {
+                setTimeout(() => {
+                    nextQuestion();
+                }, 300); 
+            }
+        }
+
+        function calculateResult() {
+            const scores = { E: 0, S: 0, T: 0, J: 0 };
+            const maxScore = QUESTIONS.length * 3;
+            QUESTIONS.forEach((q, index) => {
+                const score = SCORE_VALUES[state.answers[index]] * q.polarity;
+                scores[q.dimension] += score;
+            });
+            let resultType = "";
+            let finalScores = {};
+            const processDimension = (dimA, dimB, score) => {
+                const polarity = (score / maxScore) * 100;
+                const percentA = Math.round(50 + (polarity / 2));
+                const activeType = (score >= 0) ? dimA : dimB;
+                return { typeA: dimA, percentA: percentA, typeB: dimB, percentB: 100 - percentA, active: activeType };
+            };
+
+            finalScores.EI = processDimension('E', 'I', scores.E);
+            finalScores.SN = processDimension('S', 'N', scores.S);
+            finalScores.TF = processDimension('T', 'F', scores.T);
+            finalScores.JP = processDimension('J', 'P', scores.J);
+            
+            resultType += finalScores.EI.active;
+            resultType += finalScores.SN.active;
+            resultType += finalScores.TF.active;
+            resultType += finalScores.JP.active;
+
+            state.finalResult = PERSONALITY_TYPES[resultType];
+            state.finalScores = finalScores;
+            state.isQuizFinished = true;
+            state.view = 'result';
+            updateUsageCounter();
+            render();
+        }
+        
+        // --- FEEDBACK & ADMIN FUNCTIONS ---
+        function showFeedbackForm() {
+            const html = `
+                <div class="modal-overlay modal-show" onclick="hideFeedbackForm(event)">
+                    <div class="modal-content" onclick="event.stopPropagation()">
+                        <h3 class="text-2xl font-bold text-secondary-yellow mb-4">আপনার মতামত দিন</h3>
+                        <p class="text-gray-300 mb-4 text-sm">অ্যাপটি ভালো লাগলে আপনার মন্তব্য জানাতে পারেন।</p>
+                        
+                        <input type="text" id="feedback-name" placeholder="আপনার নাম" class="w-full p-3 mb-3 rounded-lg bg-primary-dark border border-2 border-gray-600 text-text-light focus:border-secondary-yellow outline-none" maxlength="50" />
+                        <textarea id="feedback-message" placeholder="আপনার মন্তব্য" rows="4" class="w-full p-3 mb-6 rounded-lg bg-primary-dark border border-2 border-gray-600 text-text-light focus:border-secondary-yellow outline-none resize-none" required minlength="1"></textarea>
+                        
+                        <div class="flex justify-end gap-3">
+                            <button onclick="hideFeedbackForm()" class="px-5 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">বাতিল করুন</button>
+                            <button onclick="submitFeedback()" id="submit-feedback-btn" class="px-5 py-2 bg-secondary-yellow text-primary-dark font-bold rounded-lg hover:bg-yellow-400 transition">জমা দিন</button>
+                        </div>
+                        <p id="feedback-status" class="mt-4 text-center text-sm text-red-400"></p>
+                    </div>
+                </div>
+            `;
+            modalContainer.innerHTML = html;
+        }
+
+        function hideFeedbackForm(event) {
+            // Only hide if the overlay (parent) is clicked, or if called without event
+            if (event && event.target.classList.contains('modal-overlay')) {
+                 modalContainer.innerHTML = '';
+            } else if (!event) {
+                 modalContainer.innerHTML = '';
+            }
+        }
+        
+        async function submitFeedback() {
+            if (!state.firebaseInitialized || !db) {
+                document.getElementById('feedback-status').textContent = 'ত্রুটি: ডেটাবেস প্রস্তুত নয়। কিছুক্ষণ অপেক্ষা করে আবার চেষ্টা করুন।';
+                return;
+            }
+            
+            const nameInput = document.getElementById('feedback-name');
+            const messageInput = document.getElementById('feedback-message');
+            const statusDiv = document.getElementById('feedback-status');
+            const submitBtn = document.getElementById('submit-feedback-btn');
+
+            const name = nameInput.value.trim() || 'Anonymous';
+            const message = messageInput.value.trim();
+            // Gathering all device info for storage, even if not displayed in admin panel
+            const deviceInfo = getDeviceInfo();
+            
+            if (message.length < 1) {
+                statusDiv.textContent = 'মন্তব্যটি খালি রাখা যাবে না।';
+                return;
+            }
+            
+            statusDiv.textContent = 'জমা হচ্ছে...';
+            submitBtn.disabled = true;
+            
+            try {
+                await addDoc(collection(db, FEEDBACK_COLLECTION), {
+                    name: name,
+                    message: message,
+                    timestamp: Date.now(),
+                    userId: state.userId,
+                    deviceDetails: deviceInfo.userAgent,
+                    localeInfo: deviceInfo.language,
+                    screenResolution: `${deviceInfo.screenWidth}x${deviceInfo.screenHeight}`
+                });
+                
+                statusDiv.innerHTML = '<span class="text-green-400 font-bold">✔️ ধন্যবাদ! আপনার মন্তব্য জমা হয়েছে।</span>';
+                
+                nameInput.value = '';
+                messageInput.value = '';
+                
+                setTimeout(() => {
+                    modalContainer.innerHTML = '';
+                }, 2500);
+
+            } catch (error) {
+                console.error("Error submitting feedback:", error);
+                statusDiv.textContent = 'দুঃখিত, মন্তব্য জমা দিতে সমস্যা হয়েছে।';
+                submitBtn.disabled = false;
+            }
+        }
+
+        function goToAdminLogin() {
+            state.view = 'admin_login';
+            render();
+        }
+        
+        function loginAdmin() {
+            const usernameInput = document.getElementById('admin-username');
+            const passwordInput = document.getElementById('admin-password');
+            const statusDiv = document.getElementById('admin-status');
+            
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                statusDiv.textContent = 'সফল! ড্যাশবোর্ডে প্রবেশ করছে...';
+                state.isAdminLoggedIn = true;
+                state.view = 'admin_dashboard';
+                setupFeedbackListener(); 
+                render();
+            } else {
+                statusDiv.textContent = 'ভুল ইউজারনেম বা পাসওয়ার্ড।';
+            }
+        }
+
+        // --- EXPOSE FUNCTIONS GLOBALLY ---
+        window.goToHome = goToHome;
+        window.startQuiz = startQuiz;
+        window.nextQuestion = nextQuestion;
+        window.previousQuestion = previousQuestion;
+        window.selectAnswer = selectAnswer;
+        window.showFeedbackForm = showFeedbackForm;
+        window.hideFeedbackForm = hideFeedbackForm;
+        window.submitFeedback = submitFeedback;
+        window.goToAdminLogin = goToAdminLogin;
+        window.loginAdmin = loginAdmin;
+        
+        
+        // --- RENDERING VIEWS ---
+        
+        function renderWelcome() {
+            // Usage counter removed from welcome screen as requested
+            
+            return `
+                <div class="text-center p-8 md:p-12 flex flex-col items-center relative">
+                    <h1 class="text-5xl md:text-7xl font-extrabold text-secondary-yellow mb-4 leading-tight inline-block p-2 rounded-xl">
+                        Personality Map
+                    </h1>
+                    <p class="text-xl md:text-2xl font-medium text-primary-light mt-4 mb-12">
+                        আপনার ব্যক্তিত্বের ১৬টি ধরন জানুন
+                    </p>
+
+                    <p class="text-base md:text-lg text-gray-300 mb-8 max-w-lg mx-auto">
+                        এই কুইজে মোট ২০টি প্রশ্ন রয়েছে। আপনার উত্তরগুলি বিশ্লেষণ করে আপনার চার অক্ষরের ব্যক্তিত্বের প্রকারভেদ (যেমন: INTJ, ESFP) নির্ধারণ করা হবে। প্রতিটি প্রশ্নের ক্ষেত্রে আপনার সম্মতি বা দ্বিমতের মাত্রা নির্বাচন করুন।
+                    </p>
+
+                    <button
+                        onclick="startQuiz()"
+                        class="px-10 py-4 bg-secondary-yellow text-primary-dark font-bold text-xl rounded-full shadow-2xl hover:bg-yellow-400 transition transform hover:scale-105"
+                    >
+                        কুইজ শুরু করুন →
+                    </button>
+                    
+                    <div class="mt-12 w-full text-center text-sm text-gray-500">
+                        <span>Developed by Biplob</span>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function renderQuiz() {
+            const q = QUESTIONS[state.currentQuestionIndex];
+            if (!q) return '';
+
+            const selectedScoreIndex = state.answers[state.currentQuestionIndex];
+            const isAnswerSelected = selectedScoreIndex !== null;
+            const isLastQuestion = state.currentQuestionIndex === QUESTIONS.length - 1;
+
+            const buttonsHtml = SCALE_LABELS_SHORT.map((label, index) => {
+                const isSelected = index === selectedScoreIndex;
+                return `
+                    <button 
+                        onclick="selectAnswer(${index})" 
+                        class="scale-button ${isSelected ? 'selected' : ''}" 
+                        aria-label="${label}"
+                    >
+                        ${label}
+                    </button>
+                `;
+            }).join('');
+            
+            const renderScaleKey = () => `
+                <div class="scale-explanation p-3 rounded-xl mb-6 text-sm md:text-base bg-primary-dark border-2 border-secondary-yellow/50">
+                    <div class="flex justify-between text-xs md:text-sm text-gray-300">
+                        <div class="p-1 text-center font-bold text-red-300">
+                            <span class="block text-secondary-yellow text-lg">-৩</span>
+                            <span class="block">সম্পূর্ণ দ্বিমত</span>
+                        </div>
+                        <div class="p-1 text-center font-bold text-gray-400">
+                            <span class="block text-secondary-yellow text-lg">০</span>
+                            <span class="block">নিরপেক্ষ</span>
+                        </div>
+                        <div class="p-1 text-center font-bold text-green-300">
+                            <span class="block text-secondary-yellow text-lg">+৩</span>
+                            <span class="block">সম্পূর্ণ একমত</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            const renderProgress = () => {
+                const total = QUESTIONS.length;
+                const current = state.currentQuestionIndex + 1;
+                const answered = state.answers.filter(a => a !== null).length;
+                const completedPercentage = Math.round((answered / total) * 100);
+                const progress = (current / total) * 100;
+
+                return `
+                    <div class="mb-8 p-3 bg-primary-dark rounded-xl">
+                        <div class="text-sm font-semibold text-secondary-yellow mb-2 flex justify-between">
+                            <span>প্রশ্ন ${current} / ${total}</span>
+                            <span>${completedPercentage}% সম্পন্ন</span>
+                        </div>
+                        <div class="w-full bg-[#2C6E70] rounded-full h-3 overflow-hidden">
+                            <div class="bg-secondary-yellow h-3 rounded-full transition-all duration-500 ease-in-out" style="width: ${progress}%;"></div>
+                        </div>
+                    </div>
+                `;
+            };
+
+            return `
+                ${renderProgress()}
+                
+                <div id="question-content" class="question-content">
+                    <h2 class="text-2xl md:text-3xl font-bold text-primary-light mb-8 leading-relaxed">
+                        ${q.text}
+                    </h2>
+                    
+                    ${renderScaleKey()}
+
+                    <!-- Responsive Scale Container -->
+                    <div class="scale-container">
+                        ${buttonsHtml}
+                    </div>
+                    
+                    <!-- Dynamic Score Description -->
+                    <div class="text-center mt-6">
+                        <p class="text-lg font-bold text-secondary-yellow mb-2">
+                           ${isAnswerSelected ? 'আপনার নির্বাচন:' : '(একটি উত্তর নির্বাচন করুন)'}
+                        </p>
+                        <p id="score-description" class="text-base font-medium ${state.dynamicScoreColor}">
+                            ${state.dynamicScoreDescription || ''}
+                        </p>
+                    </div>
+
+
+                </div>
+
+                <div class="mt-10 flex justify-between">
+                    <button 
+                        onclick="previousQuestion()"
+                        class="px-5 py-3 bg-primary-light text-primary-dark font-semibold rounded-xl hover:bg-white transition disabled:opacity-30 disabled:cursor-not-allowed"
+                        ${state.currentQuestionIndex === 0 ? 'disabled' : ''}
+                    >
+                        ← পূর্ববর্তী
+                    </button>
+                    <button 
+                        onclick="nextQuestion()"
+                        class="px-8 py-3 bg-secondary-yellow text-primary-dark font-bold text-lg rounded-xl shadow-lg hover:bg-yellow-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        ${!isAnswerSelected ? 'disabled' : ''}
+                    >
+                        ${isLastQuestion ? 'ফলাফল দেখুন' : 'পরবর্তী →'}
+                    </button>
+                </div>
+                
+                <div class="mt-12 text-center text-sm text-gray-500 border-t border-gray-700 pt-4 flex justify-between items-center">
+                    <button onclick="goToHome()" class="text-gray-400 hover:text-secondary-yellow transition underline p-1 text-base font-semibold">
+                        ← হোম
+                    </button>
+                    <span>Developed by Biplob</span>
+                </div>
+            `;
+        }
+        
+        function renderResult() {
+            const result = state.finalResult;
+            const scores = state.finalScores;
+            if (!result || !scores) return '';
+            
+            const renderScoreBar = (dimensionData, roleColor) => {
+                const isLeftActive = dimensionData.active === dimensionData.typeA;
+                return `
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2 text-sm md:text-base font-bold">
+                            <span class="${isLeftActive ? 'text-secondary-yellow' : 'text-gray-400'}">${DIMENSION_LABELS[dimensionData.typeA]}</span>
+                            <span class="${!isLeftActive ? 'text-secondary-yellow' : 'text-gray-400'}">${DIMENSION_LABELS[dimensionData.typeB]}</span>
+                        </div>
+                        <div class="flex h-3 rounded-full overflow-hidden shadow-inner">
+                            <div class="h-full transition-all duration-700 ease-in-out ${isLeftActive ? 'bg-secondary-yellow' : 'bg-gray-700'}" style="width: ${dimensionData.percentA}%;"></div>
+                            <div class="h-full transition-all duration-700 ease-in-out ${!isLeftActive ? 'bg-secondary-yellow' : 'bg-gray-700'}" style="width: ${dimensionData.percentB}%;"></div>
+                        </div>
+                        <div class="flex justify-between mt-1 text-xs text-gray-400 font-medium">
+                            <span>${dimensionData.percentA}%</span>
+                            <span>${dimensionData.percentB}%</span>
+                        </div>
+                    </div>
+                `;
+            };
+
+            const themeColorClass = ROLE_COLORS[result.role];
+            const BadgeIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 md:w-10 md:h-10 text-primary-dark"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 3 3 3 3 0 0 0 3-3V5a3 3 0 0 0-3-3z"/><path d="M7.74 15.39a8 8 0 1 0 8.51 0"/></svg>`;
+
+
+            return `
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-secondary-yellow mb-2">আপনার ব্যক্তিত্বের ধরন</h1>
+                    <p class="text-lg md:text-xl font-medium text-gray-300 mb-8">ব্যক্তিত্বের মানচিত্রের উপর ভিত্তি করে আপনার প্রোফাইল</p>
+                    
+                    <div class="result-card p-6 md:p-10 rounded-2xl border-4 bg-primary-dark border-${themeColorClass} shadow-2xl">
+                        
+                        <!-- Personality Type Badge -->
+                        <div class="inline-flex items-center justify-center p-4 md:p-6 bg-secondary-yellow rounded-full mb-6 transform rotate-[-1deg] shadow-xl">
+                            <span class="text-3xl md:text-5xl font-black text-primary-dark">${result.type}</span>
+                            <span class="ml-3">${BadgeIcon}</span>
+                        </div>
+                        
+                        <h2 class="text-3xl md:text-4xl font-bold text-primary-light mb-2">
+                            ${result.name} ${result.emoji}
+                        </h2>
+                        <p class="text-xl font-semibold text-${themeColorClass} mb-6">ভূমিকা: ${result.role === 'Analyst' ? 'বিশ্লেষক' : result.role === 'Diplomat' ? 'কূটনীতিক' : result.role === 'Sentinel' ? 'প্রহরী' : 'অনুসন্ধানকারী'}</p>
+                        
+                        <p class="text-base md:text-lg text-gray-300 mb-8 max-w-xl mx-auto border-t border-b border-${themeColorClass} py-4">
+                            ${result.description}
+                        </p>
+
+                        <!-- Score Breakdown Section -->
+                        <div class="mt-10 text-left max-w-xl mx-auto">
+                            <h3 class="text-2xl font-bold mb-4 text-secondary-yellow border-b border-secondary-yellow pb-2">আপনার অক্ষীয় স্কোর</h3>
+                            ${renderScoreBar(scores.EI, themeColorClass)}
+                            ${renderScoreBar(scores.SN, themeColorClass)}
+                            ${renderScoreBar(scores.TF, themeColorClass)}
+                            ${renderScoreBar(scores.JP, themeColorClass)}
+                        </div>
+                        
+                    </div>
+
+                    <p class="mt-8 text-sm text-gray-500">
+                        এই ফলাফলটি আপনার দেওয়া উত্তরের উপর ভিত্তি করে তৈরি। ব্যক্তিত্বের বিকাশ এবং পরিবর্তন একটি চলমান প্রক্রিয়া।
+                    </p>
+                    
+                    <button
+                        onclick="startQuiz()"
+                        class="mt-6 px-8 py-4 bg-primary-light text-primary-dark font-bold text-lg rounded-xl hover:bg-white transition transform hover:scale-[1.03] shadow-lg"
+                    >
+                        পুনরায় পরীক্ষা দিন
+                    </button>
+                    
+                    <!-- Feedback Section - Small box -->
+                    <div class="feedback-box mt-12 max-w-xs mx-auto text-center bg-primary-dark p-4 rounded-xl border border-secondary-yellow shadow-lg">
+                        <p class="mb-2 text-sm text-gray-300">অ্যাপটি কেমন লেগেছে?</p>
+                        <!-- Corrected/Confirmed Feedback Button -->
+                        <button 
+                            onclick="showFeedbackForm()" 
+                            class="inline-block px-4 py-2 bg-secondary-yellow text-primary-dark font-bold text-sm rounded-lg hover:bg-yellow-400 transition transform hover:scale-105"
+                            aria-label="Submit feedback"
+                        >
+                            ফিডব্যাক দিন ✉️
+                        </button>
+                    </div>
+
+                    <!-- Bottom Row for Navigation and Copyright -->
+                    <div class="mt-4 flex justify-between items-center text-sm text-gray-500 border-t border-gray-800 pt-4">
+                        <button onclick="goToHome()" class="text-gray-400 hover:text-secondary-yellow transition underline p-1 text-base font-semibold">
+                            ← হোম
+                        </button>
+                        <span>Developed by Biplob</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAdminLogin() {
+            return `
+                <div class="text-center p-8 md:p-12 max-w-sm mx-auto">
+                    <h1 class="text-3xl font-extrabold text-secondary-yellow mb-6">অ্যাডমিন লগইন</h1>
+                    <p class="text-gray-400 mb-8">ফিডব্যাক দেখতে আপনার ইউজারনেম এবং পাসওয়ার্ড দিন।</p>
+                    
+                    <div class="space-y-4">
+                        <input type="text" id="admin-username" placeholder="ইউজারনেম" class="w-full p-3 rounded-lg bg-primary-dark border border-2 border-gray-600 text-text-light focus:border-secondary-yellow outline-none" value="" />
+                        <input type="password" id="admin-password" placeholder="পাসওয়ার্ড" class="w-full p-3 rounded-lg bg-primary-dark border border-2 border-gray-600 text-text-light focus:border-secondary-yellow outline-none" value="" />
+                    </div>
+                    
+                    <button
+                        onclick="loginAdmin()"
+                        class="mt-8 w-full px-10 py-3 bg-secondary-yellow text-primary-dark font-bold text-lg rounded-xl shadow-lg hover:bg-yellow-400 transition transform hover:scale-[1.03]"
+                    >
+                        লগইন
+                    </button>
+                    
+                    <p id="admin-status" class="mt-4 text-center text-sm text-red-400 font-semibold"></p>
+                </div>
+                
+                <!-- Footer Navigation -->
+                <div class="mt-12 text-center text-sm text-gray-500 border-t border-gray-700 pt-4 flex justify-between items-center">
+                    <button onclick="goToHome()" class="text-gray-400 hover:text-secondary-yellow transition underline p-1 text-base font-semibold">
+                        ← হোম
+                    </button>
+                    <span>Developed by Biplob</span>
+                </div>
+            `;
+        }
+
+        function renderAdminDashboard() {
+            // Function to format time for readability
+            const formatTime = (timestamp) => {
+                if (!timestamp) return 'তারিখ নেই';
+                return new Date(timestamp).toLocaleString('bn-BD', {
+                    year: 'numeric', month: 'short', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit', hour12: true
+                });
+            };
+
+            const feedbackListHtml = state.feedbackList.length > 0
+                ? state.feedbackList.map(f => {
+                    const date = formatTime(f.timestamp);
+                    
+                    // All device/locale info data is intentionally removed from display for security/privacy
+                    return `
+                        <div class="bg-primary-dark p-4 rounded-xl mb-4 border border-secondary-yellow/30 shadow-md">
+                            <div class="flex justify-between items-start text-secondary-yellow text-sm mb-2 border-b border-gray-700 pb-2">
+                                <span class="font-bold text-xl text-primary-light">${f.name || 'Anonymous'}</span>
+                                <div class="flex items-center space-x-2">
+                                    <button 
+                                        onclick="deleteFeedback('${f.id}')" 
+                                        class="text-red-400 hover:text-red-500 transition px-3 py-1 rounded-lg border border-red-400 text-xs font-semibold"
+                                        aria-label="Delete feedback ID: ${f.id}"
+                                    >
+                                        মুছে ফেলুন (🗑️)
+                                    </button>
+                                </div>
+                            </div>
+                            <p class="text-base text-gray-200 whitespace-pre-wrap mb-3">${f.message}</p>
+                            
+                            <div class="mt-3 pt-3 border-t border-gray-800 text-xs text-gray-500 text-right">
+                                <p class="text-xs text-gray-500">
+                                    সময়: <span class="text-gray-300 font-medium">${date}</span>
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                }).join('')
+                : `<p class="text-center text-gray-400 p-8">এখন পর্যন্ত কোনো ফিডব্যাক জমা পড়েনি।</p>`;
+
+            return `
+                <div class="p-4 md:p-6">
+                    <h1 class="text-3xl font-extrabold text-secondary-yellow mb-8 border-b border-gray-700 pb-2">অ্যাডমিন ড্যাশবোর্ড</h1>
+                    
+                    <!-- Total Uses Counter (Visible only to Admin) -->
+                    <div class="mb-8 p-4 bg-[#2C6E70] rounded-xl shadow-inner flex justify-between items-center border border-secondary-yellow">
+                        <span class="text-lg font-bold text-primary-light">মোট ব্যবহার (Total Uses):</span>
+                        <span class="text-4xl font-extrabold text-secondary-yellow">${state.totalUses.toLocaleString('bn-BD')}</span>
+                    </div>
+                    <!-- End Total Uses Counter -->
+
+                    <h2 class="text-xl font-bold text-primary-light mb-4">ফিডব্যাক এন্ট্রি (${state.feedbackList.length}টি)</h2>
+                    
+                    <div class="h-[400px] overflow-y-auto pr-2">
+                        ${feedbackListHtml}
+                    </div>
+
+                    <p class="mt-8 text-sm text-gray-500 border-t border-gray-700 pt-4">
+                        দ্রষ্টব্য: এই ফিডব্যাকগুলি রিয়েল-টাইমে আপডেট হচ্ছে।
+                    </p>
+                </div>
+                
+                <!-- Footer Navigation -->
+                <div class="mt-4 flex justify-between items-center text-sm text-gray-500 border-t border-gray-800 pt-4">
+                    <button onclick="goToHome()" class="text-gray-400 hover:text-secondary-yellow transition underline p-1 text-base font-semibold">
+                        ← লগ আউট ও হোম
+                    </button>
+                    <span>Developed by Biplob</span>
+                </div>
+            `;
+        }
+
+        // Setup feedback listener for admin dashboard
+        function setupFeedbackListener() {
+            if (!state.firebaseInitialized || !state.isAdminLoggedIn) return;
+            
+            if (unsubscribeFeedback) unsubscribeFeedback(); 
+
+            const feedbackQuery = query(
+                collection(db, FEEDBACK_COLLECTION),
+            );
+
+            unsubscribeFeedback = onSnapshot(feedbackQuery, (snapshot) => {
+                const feedbackData = [];
+                snapshot.forEach(doc => {
+                    feedbackData.push({ id: doc.id, ...doc.data() });
+                });
+                
+                feedbackData.sort((a, b) => b.timestamp - a.timestamp);
+                
+                state.feedbackList = feedbackData;
+                if (state.view === 'admin_dashboard') render();
+            }, (error) => {
+                console.error("Error setting up feedback listener:", error);
+                state.feedbackList = [{ id: 'error', name: 'ERROR', message: 'ফিডব্যাক লোড করার সমস্যা।', timestamp: new Date() }];
+                if (state.view === 'admin_dashboard') render();
+            });
+        }
+        
+        async function deleteFeedback(feedbackId) {
+            if (!state.isAdminLoggedIn || !db) {
+                console.error("Not authorized or database not ready to delete.");
+                return;
+            }
+            
+            try {
+                const docRef = doc(db, FEEDBACK_COLLECTION, feedbackId);
+                await deleteDoc(docRef);
+                console.log("Feedback deleted successfully:", feedbackId);
+            } catch (error) {
+                console.error("Error deleting feedback:", error);
+            }
+        }
+        window.deleteFeedback = deleteFeedback;
+        
+        // --- ADMIN BUTTON VISIBILITY CONTROL ---
+        function updateAdminButtonVisibility() {
+            const btn = document.getElementById('admin-toggle-btn');
+            if (!btn) return;
+
+            // Show the subtle 'A' button ONLY on user-facing views
+            if (state.view === 'welcome' || state.view === 'quiz' || state.view === 'result') {
+                btn.classList.remove('hidden');
+            } else {
+                // Hide it on admin-specific pages
+                btn.classList.add('hidden');
+            }
+        }
+
+        // Main render function
+        function render() {
+            if (state.view === 'welcome') {
+                appDiv.innerHTML = renderWelcome();
+            } else if (state.view === 'quiz') {
+                appDiv.innerHTML = renderQuiz();
+                setTimeout(() => {
+                    const contentDiv = document.getElementById('question-content');
+                    if (contentDiv) {
+                        contentDiv.classList.remove('animate-out');
+                        contentDiv.style.transform = 'translateX(0)'; 
+                    }
+                }, 50);
+            } else if (state.view === 'result') {
+                appDiv.innerHTML = renderResult();
+            } else if (state.view === 'admin_login') {
+                appDiv.innerHTML = renderAdminLogin();
+            } else if (state.view === 'admin_dashboard' && state.isAdminLoggedIn) {
+                appDiv.innerHTML = renderAdminDashboard();
+            } else {
+                 goToHome();
+            }
+            
+            // Final step: update button visibility based on the current view
+            updateAdminButtonVisibility();
+        }
+        
+        // --- INITIALIZATION ---
+        // OPTIMIZATION: Call render immediately to show UI content instantly (Perceived performance)
+        document.addEventListener('DOMContentLoaded', () => {
+            render(); 
+            // Then start the heavy-lifting (Firebase initialization)
+            initializeFirebase(); 
+        });
+    </script>
+</body>
+</html>
